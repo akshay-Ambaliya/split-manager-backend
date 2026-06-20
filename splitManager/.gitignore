@@ -1,33 +1,72 @@
-HELP.md
+
+---
+
+## 📄 Recommended content for Spring Boot project
+
+```gitignore
+# =========================
+# Java / Spring Boot
+# =========================
+
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.class
+*.jar
+*.war
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
 *.iml
-*.ipr
+out/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# =========================
+# Eclipse / STS
+# =========================
+.classpath
+.project
+.settings/
 
-### VS Code ###
+# =========================
+# VS Code
+# =========================
 .vscode/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Environment variables
+# =========================
+.env
+
+# =========================
+# Database / local files
+# =========================
+*.db
+*.sqlite
+
+# =========================
+# Spring Boot configs (optional safety)
+# =========================
+application-local.properties
+application-dev.properties
+application.perperties
+# =========================
+# Build folders
+# =========================
+build/
