@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @Builder
 public class UserBalanceDTO {
 
-    private Long payToUserId;
-    private String payToName;
+    private Long userId;
+    private String fullName;
     private BigDecimal amount;
 
 }

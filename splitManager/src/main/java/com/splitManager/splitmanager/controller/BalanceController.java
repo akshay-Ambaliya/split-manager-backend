@@ -6,7 +6,6 @@ import com.splitManager.splitmanager.service.BalanceService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +31,24 @@ public class BalanceController {
             @PathVariable Long userId) {
 
         ApiResponse<BalanceResponseDTO> data = balanceService.getUserBalance(userId);
+        return ResponseEntity.status(data.getStatus()).body(data);
+    }
+
+    @GetMapping("/group/{groupId}/payable")
+    public ResponseEntity<ApiResponse<List<UserBalanceDTO>>> getPayables(
+            @PathVariable Long groupId,
+            HttpServletRequest request
+    ){
+        ApiResponse<List<UserBalanceDTO>> data = balanceService.getPayables(groupId, jwtUtil.extractEmailFromRequest(request));
+        return ResponseEntity.status(data.getStatus()).body(data);
+    }
+
+    @GetMapping("/group/{groupId}/receivable")
+    public ResponseEntity<ApiResponse<List<UserBalanceDTO>>> getReceivable(
+            @PathVariable Long groupId,
+            HttpServletRequest request
+    ){
+        ApiResponse<List<UserBalanceDTO>> data = balanceService.getReceivables(groupId, jwtUtil.extractEmailFromRequest(request));
         return ResponseEntity.status(data.getStatus()).body(data);
     }
 }
