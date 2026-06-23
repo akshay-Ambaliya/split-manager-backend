@@ -3,9 +3,9 @@ package com.splitManager.splitmanager.service.impl;
 import com.splitManager.splitmanager.dto.request.CreateExpenseRequestDTO;
 import com.splitManager.splitmanager.dto.request.ExpenseUpdateRequestDTO;
 import com.splitManager.splitmanager.dto.request.SplitRequestDTO;
+import com.splitManager.splitmanager.dto.request.SplitUserDTO;
 import com.splitManager.splitmanager.dto.response.ApiResponse;
 import com.splitManager.splitmanager.dto.response.ExpenseResponseDTO;
-import com.splitManager.splitmanager.dto.response.GroupMemberResponseDTO;
 import com.splitManager.splitmanager.entity.*;
 import com.splitManager.splitmanager.exception.BadRequestException;
 import com.splitManager.splitmanager.exception.ResourceNotFoundException;
@@ -15,6 +15,7 @@ import com.splitManager.splitmanager.split.SplitStrategy;
 import com.splitManager.splitmanager.split.SplitStrategyFactory;
 import com.splitManager.splitmanager.split.SplitValidationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,11 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExpenseServiceImpl implements ExpenseService {
@@ -39,6 +40,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final SplitStrategyFactory splitStrategyFactory;
+    private final GroupMemberRepository groupMemberRepository;
 
     @Override
     public ApiResponse<Object> createExpense(CreateExpenseRequestDTO request, String email) {
@@ -48,6 +50,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         Group group = groupRepository.findById(request.getGroupId())
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+
+        validateGroupMember(group,request);
+        validatePaidByUser(group, paidBy);
 
         Expense expense = Expense.builder()
                 .group(group)
@@ -98,6 +103,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .data(response)
                 .build();
     }
+
 
     @Override
     public ApiResponse<ExpenseResponseDTO> getExpense(Long expenseId) {
@@ -213,5 +219,36 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .status(HttpStatus.OK)
                 .data(dtoPage)
                 .build();
+    }
+
+    private void validateGroupMember(Group group, CreateExpenseRequestDTO request) {
+
+        for (SplitUserDTO splitUser : request.getSplits()) {
+
+            boolean isMember = groupMemberRepository.existsByGroupIdAndUserId(
+                    group.getId(),
+                    splitUser.getUserId()
+            );
+
+            if (!isMember) {
+                throw new BadRequestException(
+                        "Provided Group Member with id "+ splitUser.getUserId() +"is not a member of this group."
+                );
+            }
+        }
+    }
+
+    private void validatePaidByUser(Group group, User paidBy) {
+
+        boolean isMember = groupMemberRepository.existsByGroupIdAndUserId(
+                group.getId(),
+                paidBy.getId()
+        );
+
+        if (!isMember) {
+            throw new BadRequestException(
+                    "The Provided payer is not a member of this group."
+            );
+        }
     }
 }

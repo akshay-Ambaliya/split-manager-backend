@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
         ApiResponse<Object> response = ApiResponse.<Object>builder()
                 .success(false)
-                .message("Validation Failed")
+                .message(ex.getMessage())
                 .status(org.springframework.http.HttpStatus.BAD_REQUEST)
                 .data(errors)
                 .build();
@@ -52,12 +52,10 @@ public class GlobalExceptionHandler {
 
         ApiResponse<Object> response = ApiResponse.<Object>builder()
                 .success(false)
-                .message("Internal Server Error")
+                .message(ex.getMessage())
                 .status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
                 .data(null)
                 .build();
-
-        ex.printStackTrace(); // in real system use logger
 
         return ResponseEntity.internalServerError().body(response);
     }
